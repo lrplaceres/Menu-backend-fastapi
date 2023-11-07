@@ -10,6 +10,7 @@ class EstablecimientoCreate(BaseModel):
     instagram: str|None
     municipio_id: int|None
     geolocalizacion: str|None
+    activo: bool
     
 # Complete Establecimiento Schema (Pydantic Model)
 class Establecimiento(BaseModel):
@@ -22,3 +23,4 @@ class Establecimiento(BaseModel):
     instagram: str|None
     municipio_id: int|None
     geolocalizacion: str|None
+    activo: bool

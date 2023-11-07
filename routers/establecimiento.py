@@ -26,13 +26,13 @@ def read_establecimiento_list(start: int = 0, limit: int = 10):
     return establecimientodb_list
 
 @router.post("/establecimiento", response_model=schemas.establecimiento.Establecimiento, status_code=status.HTTP_201_CREATED, tags=["establecimiento"])
-async def create_establecimiento(nombre:Annotated[str, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
+async def create_establecimiento(nombre:Annotated[str, Form()], activo:Annotated[bool, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
     
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
 
     # create an instance of the ToDo database model
-    establecimientodb = models.models.Establecimiento(nombre = nombre, contacto = contacto, direccion = direccion, facebook = facebook, instagram = instagram, municipio_id = municipio_id, geolocalizacion = geolocalizacion, foto = foto.filename)
+    establecimientodb = models.models.Establecimiento(nombre = nombre, contacto = contacto, direccion = direccion, facebook = facebook, instagram = instagram, municipio_id = municipio_id, geolocalizacion = geolocalizacion, foto = foto.filename, activo = activo)
     
     # add it to the session and commit it
     session.add(establecimientodb)
@@ -71,7 +71,7 @@ async def read_establecimiento(id: int):
     return establecimientodb
 
 @router.put("/establecimiento/{id}", tags=["establecimiento"])
-async def update_establecimiento(id: int, nombre:Annotated[str, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
+async def update_establecimiento(id: int, nombre:Annotated[str, Form()], activo:Annotated[bool, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
 
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
@@ -85,6 +85,7 @@ async def update_establecimiento(id: int, nombre:Annotated[str, Form()], foto: U
     # update todo item with the given task (if an item with the given id was found)
     if establecimientodb:
         establecimientodb.nombre = nombre
+        establecimientodb.activo = activo
         establecimientodb.direccion = direccion
         establecimientodb.foto = foto.filename
         establecimientodb.facebook = facebook

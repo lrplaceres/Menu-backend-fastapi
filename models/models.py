@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean
 from database.database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
@@ -34,6 +34,7 @@ class Establecimiento(Base):
     facebook: Mapped[str|None] = Column(String(256))
     municipio_id: Mapped[int] = Column(Integer)
     geolocalizacion: Mapped[str|None] = Column(String(256))
+    activo: Mapped[bool] = Column(Boolean, default=False)
 
     categorias: Mapped[int|None] = relationship("Categoria", back_populates="establecimiento")
     productos: Mapped[int|None] = relationship("Producto", back_populates="establecimiento")
@@ -59,6 +60,7 @@ class Producto(Base):
     moneda: Mapped[str|None] = Column(String(256))
     categoria_id : Mapped[int] = Column(Integer, ForeignKey("categoria.id"))
     establecimiento_id: Mapped[int] = Column(Integer, ForeignKey("establecimiento.id"))
+    activo: Mapped[bool] = Column(Boolean, default=False)
 
     categoria: Mapped[int] = relationship("Categoria", back_populates = "productos")
     establecimiento: Mapped[int] = relationship("Establecimiento", back_populates = "productos")

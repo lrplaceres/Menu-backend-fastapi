@@ -13,13 +13,13 @@ Base.metadata.create_all(engine)
 router = APIRouter()
 
 @router.post("/producto", response_model=schemas.producto.Producto, status_code=status.HTTP_201_CREATED, tags=["producto"])
-async def create_producto(nombre: Annotated[str, Form()], foto: UploadFile, categoria_id:Annotated[int, Form()],establecimiento_id:Annotated[int, Form()], descripcion:Annotated[str|None, Form()]=None, precio:Annotated[float|None, Form()]=None, moneda:Annotated[str|None, Form()]=None):
+async def create_producto(nombre: Annotated[str, Form()], activo:Annotated[bool, Form()], foto: UploadFile, categoria_id:Annotated[int, Form()],establecimiento_id:Annotated[int, Form()], descripcion:Annotated[str|None, Form()]=None, precio:Annotated[float|None, Form()]=None, moneda:Annotated[str|None, Form()]=None):
 
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
 
     # create an instance of the ToDo database model
-    productodb = models.models.Producto(nombre = nombre, descripcion = descripcion, precio = precio, moneda = moneda, categoria_id = categoria_id, establecimiento_id = establecimiento_id, foto = foto.filename)
+    productodb = models.models.Producto(nombre = nombre, descripcion = descripcion, precio = precio, moneda = moneda, categoria_id = categoria_id, establecimiento_id = establecimiento_id, foto = foto.filename, activo = activo)
 
     # add it to the session and commit it
     session.add(productodb)
@@ -58,7 +58,7 @@ async def read_producto(id: int):
     return productodb
 
 @router.put("/producto/{id}", tags=["producto"])
-async def update_producto(id: int, nombre: Annotated[str, Form()], foto: UploadFile, categoria_id:Annotated[int, Form()],establecimiento_id:Annotated[int, Form()], descripcion:Annotated[str|None, Form()]=None, precio:Annotated[float|None, Form()]=None, moneda:Annotated[str|None, Form()]=None):
+async def update_producto(id: int, nombre: Annotated[str, Form()], activo:Annotated[bool, Form()], foto: UploadFile, categoria_id:Annotated[int, Form()],establecimiento_id:Annotated[int, Form()], descripcion:Annotated[str|None, Form()]=None, precio:Annotated[float|None, Form()]=None, moneda:Annotated[str|None, Form()]=None):
 
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
@@ -72,6 +72,7 @@ async def update_producto(id: int, nombre: Annotated[str, Form()], foto: UploadF
     # update todo item with the given task (if an item with the given id was found)
     if productodb:
         productodb.nombre = nombre
+        productodb.activo = activo
         productodb.foto = foto.filename
         productodb.descripcion = descripcion
         productodb.precio = precio

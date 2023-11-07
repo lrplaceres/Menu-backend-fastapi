@@ -9,6 +9,7 @@ class ProductoCreate(BaseModel):
     moneda: str|None
     categoria_id: int
     establecimiento_id: int
+    activo: bool
     
 # Complete Producto Schema (Pydantic Model)
 class Producto(BaseModel):
@@ -20,3 +21,4 @@ class Producto(BaseModel):
     moneda: str|None
     categoria_id: int
     establecimiento_id: int
+    activo: bool
