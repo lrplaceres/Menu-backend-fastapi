@@ -27,6 +27,7 @@ class Establecimiento(Base):
     __tablename__ = 'establecimiento'
     id: Mapped[int] = Column(Integer, primary_key=True)
     nombre: Mapped[str] = Column(String(256))
+    foto: Mapped[str] = Column(String(256))
     contacto: Mapped[str|None] = Column(String(256))
     direccion: Mapped[str|None] = Column(String(256))
     instagram: Mapped[str|None] = Column(String(256))
@@ -45,15 +46,17 @@ class Categoria(Base):
     establecimiento_id: Mapped[int] = Column(Integer, ForeignKey("establecimiento.id"))
 
     establecimiento: Mapped[int] = relationship("Establecimiento", back_populates = "categorias")
-    productos: Mapped[int] = relationship("Productos", back_populates="categoria")
+    productos: Mapped[int] = relationship("Producto", back_populates="categoria")
 
 
 class Producto(Base):
     __tablename__ = 'producto'
     id: Mapped[int] = Column(Integer, primary_key=True)
     nombre: Mapped[str] = Column(String(256))
+    foto: Mapped[str] = Column(String(256))
     descripcion: Mapped[str|None] = Column(String(256))
-    precio: Mapped[float] = Column(Float)
+    precio: Mapped[float|None] = Column(Float(2))
+    moneda: Mapped[str|None] = Column(String(256))
     categoria_id : Mapped[int] = Column(Integer, ForeignKey("categoria.id"))
     establecimiento_id: Mapped[int] = Column(Integer, ForeignKey("establecimiento.id"))
 

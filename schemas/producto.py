@@ -3,16 +3,20 @@ from pydantic import BaseModel
 # Create Producto Schema (Pydantic Model)
 class ProductoCreate(BaseModel):
     nombre: str
-    descripcion: str
-    precio: float
-    categoria: int
-    establecimiento: int
+    foto: str
+    descripcion: str|None
+    precio: float|None
+    moneda: str|None
+    categoria_id: int
+    establecimiento_id: int
     
 # Complete Producto Schema (Pydantic Model)
 class Producto(BaseModel):
     id: int
     nombre: str
+    foto: str
     descripcion: str|None
-    precio: float
-    categoria: int
-    establecimiento: int
+    precio: float|None
+    moneda: str|None
+    categoria_id: int
+    establecimiento_id: int

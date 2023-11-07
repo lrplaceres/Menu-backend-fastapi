@@ -3,7 +3,8 @@ from pydantic import BaseModel
 # Create Establecimiento Schema (Pydantic Model)
 class EstablecimientoCreate(BaseModel):
     nombre: str
-    contacto: str
+    foto: str|None
+    contacto: str|None
     direccion: str|None
     facebook: str|None
     instagram: str|None
@@ -14,6 +15,7 @@ class EstablecimientoCreate(BaseModel):
 class Establecimiento(BaseModel):
     id: int
     nombre: str
+    foto: str|None
     contacto: str|None
     direccion: str|None
     facebook: str|None

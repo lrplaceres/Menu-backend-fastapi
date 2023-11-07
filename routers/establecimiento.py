@@ -1,9 +1,11 @@
-from fastapi import APIRouter, status, HTTPException
-from typing import List
+from fastapi import APIRouter, status, HTTPException, UploadFile, Form
+from typing import List, Annotated
 from sqlalchemy.orm import Session
 from database.database import Base, engine
 import schemas.establecimiento
 import models.models
+import os
+import shutil
 
 # Create the database
 Base.metadata.create_all(engine)
@@ -24,18 +26,26 @@ def read_establecimiento_list(start: int = 0, limit: int = 10):
     return establecimientodb_list
 
 @router.post("/establecimiento", response_model=schemas.establecimiento.Establecimiento, status_code=status.HTTP_201_CREATED, tags=["establecimiento"])
-async def create_establecimiento(establecimiento: schemas.establecimiento.EstablecimientoCreate):
-
+async def create_establecimiento(nombre:Annotated[str, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
+    
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
 
     # create an instance of the ToDo database model
-    establecimientodb = models.models.Establecimiento(nombre = establecimiento.nombre, contacto = establecimiento.contacto, direccion = establecimiento.direccion, facebook = establecimiento.facebook, instagram = establecimiento.instagram,municipio_id = establecimiento.municipio_id, geolocalizacion = establecimiento.geolocalizacion)
-
+    establecimientodb = models.models.Establecimiento(nombre = nombre, contacto = contacto, direccion = direccion, facebook = facebook, instagram = instagram, municipio_id = municipio_id, geolocalizacion = geolocalizacion, foto = foto.filename)
+    
     # add it to the session and commit it
     session.add(establecimientodb)
     session.commit()
     session.refresh(establecimientodb)
+
+    destino = os.getcwd() + f"/public/{establecimientodb.id}"
+    os.mkdir(destino)
+    try:
+        with open(destino + f"/{foto.filename}", "wb+") as file_object:
+            shutil.copyfileobj(foto.file, file_object)
+    finally:
+        foto.file.close()
 
     # close the session
     session.close()
@@ -61,7 +71,7 @@ async def read_establecimiento(id: int):
     return establecimientodb
 
 @router.put("/establecimiento/{id}", tags=["establecimiento"])
-async def update_establecimiento(id: int, nombre: str, contacto: str|None = None, direccion: str|None = None, facebook: str|None = None, instagram: str|None = None, municipio_id: int|None = None, geolocalizacion: str|None = None):
+async def update_establecimiento(id: int, nombre:Annotated[str, Form()], foto: UploadFile, contacto:Annotated[str|None, Form()]=None, direccion:Annotated[str|None, Form()]=None, facebook:Annotated[str|None, Form()]=None, instagram:Annotated[str|None, Form()] = None, municipio_id:Annotated[str|None, Form()]=None, geolocalizacion:Annotated[str|None, Form()]=None):
 
     # create a new database session
     session = Session(bind=engine, expire_on_commit=False)
@@ -69,10 +79,14 @@ async def update_establecimiento(id: int, nombre: str, contacto: str|None = None
     # get the provincia item with the given id
     establecimientodb: schemas.establecimiento.Establecimiento = session.query(models.models.Establecimiento).get(id)
 
+    destino = os.getcwd() + f"/public/{establecimientodb.id}"
+    os.remove(destino + f"/{establecimientodb.foto}")
+            
     # update todo item with the given task (if an item with the given id was found)
     if establecimientodb:
         establecimientodb.nombre = nombre
         establecimientodb.direccion = direccion
+        establecimientodb.foto = foto.filename
         establecimientodb.facebook = facebook
         establecimientodb.instagram = instagram
         establecimientodb.municipio_id = municipio_id
@@ -81,6 +95,12 @@ async def update_establecimiento(id: int, nombre: str, contacto: str|None = None
 
     # close the session
     session.close()
+
+    try:
+        with open(destino + f"/{foto.filename}", "wb+") as file_object:
+            shutil.copyfileobj(foto.file, file_object)           
+    finally:
+        foto.file.close()
 
     # check if todo item with given id exists. If not, raise exception and return 404 not found response
     if not establecimientodb:
@@ -102,29 +122,13 @@ async def delete_establecimiento(id: int):
         session.delete(establecimientodb)
         session.commit()
         session.close()
+
+        destino = os.getcwd() + f"/public/{establecimientodb.id}"
+        shutil.rmtree(destino)
+
     else:
         raise HTTPException(status_code=404, detail=f"establecimiento item with id {id} not found")
 
     return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
